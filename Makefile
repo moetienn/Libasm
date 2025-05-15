@@ -6,9 +6,11 @@ ASM = nasm
 CFLAGS = -Wall -Wextra -Werror
 ASMFLAGS = -f elf64
 
+
 # Source files
 ASM_SRC = srcs/mandatory/ft_strlen.asm \
-		  srcs/mandatory/ft_write.asm
+		  srcs/mandatory/ft_write.asm \
+		  srcs/mandatory/ft_strcmp.asm
 C_SRC = srcs/mandatory/main.c
 
 # Object files
