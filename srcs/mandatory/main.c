@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 // Declare the Assembly function
 extern size_t ft_strlen(const char *str);
@@ -9,6 +10,7 @@ extern ssize_t ft_write(int fd, const void *buf, size_t count);
 extern int ft_strcmp(const char *s1, const char *s2);
 extern char *ft_strcpy(char *dest, const char *src);
 extern char *ft_strdup(const char *s1);
+extern ssize_t ft_read(int fd, void *buf, size_t count);
 
 int main() {
 
@@ -387,7 +389,182 @@ int main() {
 	free(dup_special_str2);
 	printf("\n");
 
+	printf("-------- FT_READ TEST --------\n\n");
 
+	// Test ft_read
+	printf("-- read from stdin --\n\n");
+	char buffer[100];
+	write(1, "native read: ", 14);
+	ssize_t bytes_read_native = read(0, buffer, sizeof(buffer) - 1);
+	if (bytes_read_native == -1) {
+		perror("read");
+	} else {
+		buffer[bytes_read_native] = '\0';
+		write(1, "Bytes read: ", 12);
+		write(1, buffer, bytes_read_native);
+	}
+
+	write(1, "\nft_read: ", 10);
+	ssize_t bytes_read = ft_read(0, buffer, sizeof(buffer) - 1);
+	if (bytes_read == -1) {
+		perror("ft_read");
+	} else {
+		buffer[bytes_read] = '\0';
+		write(1, "Bytes read: ", 12);
+		ft_write(1, buffer, bytes_read);
+	}
+	printf("\n");
+
+	// Test ft_read with invalid file descriptor
+	printf("-- read with invalid file descriptor --\n\n");
+	ssize_t bytes_read_invalid_fd = ft_read(-1, buffer, sizeof(buffer) - 1);
+	write(1, "native read :", 14);
+	if (bytes_read_invalid_fd == -1)
+		perror("");
+	else
+	{
+		write(1, "Bytes read: ", 12);
+		write(1, buffer, bytes_read_invalid_fd);
+	}
+	
+	ssize_t bytes_read_invalid_fd2 = ft_read(-1, buffer, sizeof(buffer) - 1);
+	write(1, "ft_read: ", 10);
+	if (bytes_read_invalid_fd2 == -1)
+		perror("");
+	else
+	{
+		write(1, "Bytes read: ", 12);
+		write(1, buffer, bytes_read_invalid_fd2);
+	}
+	printf("\n");
+
+	// Test ft_read with large file descriptor
+	printf("-- read with large file descriptor --\n\n");
+	write(1, "native read: ", 14);
+	ssize_t bytes_read_large_fd = ft_read(9999, buffer, sizeof(buffer) - 1);
+	if (bytes_read_large_fd == -1)
+		perror("");
+	else
+	{
+		write(1, "Bytes read: ", 12);
+		write(1, buffer, bytes_read_large_fd);
+	}
+	write(1, "ft_read: ", 10);
+	ssize_t bytes_read_large_fd2 = ft_read(9999, buffer, sizeof(buffer) - 1);
+	if (bytes_read_large_fd2 == -1)
+		perror("");
+	else
+	{
+		write(1, "Bytes read: ", 12);
+		write(1, buffer, bytes_read_large_fd2);
+	}
+	printf("\n");
+
+	// Test ft_read with zero bytes to read
+	printf("-- read with zero bytes to read --\n\n");
+	write(1, "native read: ", 14);
+	ssize_t bytes_read_zero = ft_read(0, buffer, 0);
+	if (bytes_read_zero == -1)
+		perror("");
+	else
+	{
+		write(1, "\nBytes read: ", 13);
+		write(1, buffer, bytes_read_zero);
+	}
+	write(1, "\nft_read: ", 11);
+	ssize_t bytes_read_zero2 = ft_read(0, buffer, 0);
+	if (bytes_read_zero2 == -1)
+		perror("");
+	else
+	{
+		write(1, "\nBytes read: ", 13);
+		write(1, buffer, bytes_read_zero2);
+	}
+	printf("\n");
+
+	// Test ft_read with NULL pointer
+	printf("\n-- read with NULL pointer --\n\n");
+	char *null_buffer = NULL;
+	write(1, "native read: ", 14);
+	ssize_t bytes_read_null = read(0, null_buffer, sizeof(buffer) - 1);
+	if (bytes_read_null == -1)
+		perror("Error ");
+	else
+	{
+		write(1, "Bytes read: ", 12);
+		write(1, null_buffer, bytes_read_null);
+	}
+
+	write(1, "\nft_read: ", 10);
+	ssize_t bytes_read_null2 = ft_read(0, null_buffer, sizeof(buffer) - 1);
+	if (bytes_read_null2 == -1)
+		perror("Error ");
+	else
+	{
+		write(1, "Bytes read: ", 12);
+		write(1, null_buffer, bytes_read_null2);
+	}
+
+	// Test ft_read with a file
+	printf("\n-- read from a file that doesnt exist --\n\n");
+	write(1, "native read: ", 14);
+	int fd = open("teste.txt", O_RDONLY);
+	if (fd == -1) {
+		perror("open");
+	}
+	ssize_t bytes_read_file = read(fd, buffer, sizeof(buffer) - 1);
+	if (bytes_read_file == -1) {
+		perror("read");
+		close(fd);
+	}
+	buffer[bytes_read_file] = '\0';
+	write(1, buffer, bytes_read_file);
+	close(fd);
+
+	write(1, "\nft_read: ", 10);
+	int fd2 = open("teste.txt", O_RDONLY);
+	if (fd2 == -1) {
+		perror("open");
+	}
+	ssize_t bytes_read_file2 = ft_read(fd2, buffer, sizeof(buffer) - 1);
+	if (bytes_read_file2 == -1) {
+		perror("ft_read");
+		close(fd2);
+	}
+	buffer[bytes_read_file2] = '\0';
+	write(1, buffer, bytes_read_file2);
+	close(fd2);
+	printf("\n");
+
+	// Test ft_read with a file that exist
+	printf("\n-- read from a file that exist --\n\n");
+	write(1, "native read: ", 14);
+	fd = open("test.txt", O_RDONLY);
+	if (fd == -1) {
+		perror("open");
+	}
+	ssize_t bytes_read_file3 = read(fd, buffer, sizeof(buffer) - 1);
+	if (bytes_read_file3 == -1) {
+		perror("read");
+		close(fd);
+	}
+	buffer[bytes_read_file3] = '\0';
+	write(1, buffer, bytes_read_file3);
+	close(fd);
+	write(1, "\nft_read: ", 10);
+	fd2 = open("test.txt", O_RDONLY);
+	if (fd2 == -1) {
+		perror("open");
+	}
+	ssize_t bytes_read_file4 = ft_read(fd2, buffer, sizeof(buffer) - 1);
+	if (bytes_read_file4 == -1) {
+		perror("ft_read");
+		close(fd2);
+	}
+	buffer[bytes_read_file4] = '\0';
+	write(1, buffer, bytes_read_file4);
+	close(fd2);
+	printf("\n");
 
 	return 0;
 }

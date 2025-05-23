@@ -12,7 +12,8 @@ ASM_SRC = srcs/mandatory/ft_strlen.asm \
 		  srcs/mandatory/ft_write.asm \
 		  srcs/mandatory/ft_strcmp.asm \
 		  srcs/mandatory/ft_strcpy.asm \
-		  srcs/mandatory/ft_strdup.asm
+		  srcs/mandatory/ft_strdup.asm \
+		  srcs/mandatory/ft_read.asm
 C_SRC = srcs/mandatory/main.c
 
 # Object files
