@@ -7,7 +7,6 @@ extern  malloc
 ft_strdup:
 	mov		rax, -1
 	mov 	rbx, rdi            ; Save original src pointer in rbx
-	xor 	rcx, rcx            ; rcx = 0 (counter)
 
 .strlen_loop:
 	inc 	rax
